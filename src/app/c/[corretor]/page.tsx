@@ -41,14 +41,14 @@ export default function BrokerPublicCatalogPage() {
   if (!broker) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50 text-slate-500">
-        Carregando cat�logo...
+        Carregando catálogo...
       </div>
     );
   }
 
   const directWhatsAppUrl = buildWhatsAppUrl(
     broker.phone,
-    `Ol� ${broker.name}! Acessei seu cat�logo digital e gostaria de tirar algumas d�vidas sobre im�veis dispon�veis na sua carteira.`
+    `Olá ${broker.name}! Acessei seu catálogo digital e gostaria de tirar algumas dúvidas sobre imóveis disponíveis na sua carteira.`
   );
 
   const filteredProperties = properties.filter((p) => {
@@ -141,7 +141,7 @@ export default function BrokerPublicCatalogPage() {
                 <Search className="w-4 h-4 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
                 <input
                   type="text"
-                  placeholder="Buscar por bairro, condom�nio ou palavra-chave..."
+                  placeholder="Buscar por bairro, condom²nio ou palavra-chave..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="w-full bg-slate-50 border border-slate-200 rounded-2xl pl-11 pr-4 py-3 text-xs text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 font-medium"
@@ -180,7 +180,7 @@ export default function BrokerPublicCatalogPage() {
             {/* Type Tags */}
             <div className="flex gap-2 overflow-x-auto pb-1 custom-scrollbar">
               {[
-                { id: 'all', label: 'Todos os Im�veis' },
+                { id: 'all', label: 'Todos os Imóveis' },
                 { id: 'apartamento', label: 'Apartamentos' },
                 { id: 'casa', label: 'Casas' },
                 { id: 'cobertura', label: 'Coberturas' },
@@ -208,10 +208,10 @@ export default function BrokerPublicCatalogPage() {
           <div className="flex items-center justify-between mb-6">
             <div>
               <h2 className="text-xl font-black text-slate-900">
-                Im�veis Dispon�veis ({filteredProperties.length})
+                Imóveis Disponíveis ({filteredProperties.length})
               </h2>
               <p className="text-xs text-slate-500">
-                Selecione um im�vel para ver a galeria de fotos completa e falar direto com o corretor
+                Selecione um imóvel para ver a galeria de fotos completa e falar direto com o corretor
               </p>
             </div>
           </div>
@@ -219,9 +219,9 @@ export default function BrokerPublicCatalogPage() {
           {filteredProperties.length === 0 ? (
             <div className="bg-white rounded-3xl p-12 text-center border border-slate-200 shadow-sm">
               <Building2 className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-              <h3 className="font-bold text-slate-800 text-lg">Nenhum im�vel encontrado com estes filtros</h3>
+              <h3 className="font-bold text-slate-800 text-lg">Nenhum imóvel encontrado com estes filtros</h3>
               <p className="text-xs text-slate-400 mt-1">
-                Tente limpar os termos da busca ou clique abaixo para ver todos os im�veis da carteira.
+                Tente limpar os termos da busca ou clique abaixo para ver todos os imóveis da carteira.
               </p>
               <button
                 onClick={() => {

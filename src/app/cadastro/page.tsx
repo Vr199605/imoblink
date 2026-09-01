@@ -51,7 +51,7 @@ export default function CadastroPage() {
 
     try {
       if (isSupabaseConfigured && supabase) {
-        // 1. Criar usu�rio no Supabase Auth
+        // 1. Criar usuário no Supabase Auth
         const { data: authData, error: authError } = await supabase.auth.signUp({
           email,
           password,
@@ -77,10 +77,10 @@ export default function CadastroPage() {
               creci,
               phone,
               slug: finalSlug,
-              city: city || 'S�o Paulo',
+              city: city || 'São Paulo',
               state: state || 'SP',
               avatar_url: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&q=80&w=400',
-              bio: `Especialista em im�veis em ${city || 'S�o Paulo'}. Atendimento personalizado e exclusivo.`
+              bio: `Especialista em imóveis em ${city || 'São Paulo'}. Atendimento personalizado e exclusivo.`
             }
           ]);
           if (profileError) console.error('Profile creation error:', profileError);
@@ -96,10 +96,10 @@ export default function CadastroPage() {
           creci,
           phone,
           slug: finalSlug,
-          city: city || 'S�o Paulo',
+          city: city || 'São Paulo',
           state: state || 'SP',
           avatarUrl: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&q=80&w=400',
-          bio: `Especialista em im�veis em ${city || 'S�o Paulo'}. Atendimento personalizado e exclusivo.`,
+          bio: `Especialista em imóveis em ${city || 'São Paulo'}. Atendimento personalizado e exclusivo.`,
           viewsTotal: 0,
           leadsTotal: 0
         };
@@ -128,10 +128,10 @@ export default function CadastroPage() {
               <Building2 className="w-6 h-6" />
             </div>
             <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
-              Crie seu Cat�logo Profissional
+              Crie seu Catálogo Profissional
             </h1>
             <p className="text-xs text-slate-500">
-              Comece a vender im�veis com seu link exclusivo no WhatsApp em 2 minutos
+              Comece a vender imóveis com seu link exclusivo no WhatsApp em 2 minutos
             </p>
           </div>
 
@@ -194,7 +194,7 @@ export default function CadastroPage() {
                       type="password"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      placeholder="M�nimo 6 caracteres"
+                      placeholder="Mínimo 6 caracteres"
                       minLength={6}
                       className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-xs rounded-xl pl-10 pr-3 py-3 focus:outline-none focus:ring-2 focus:ring-emerald-500 font-medium"
                       required
@@ -204,7 +204,7 @@ export default function CadastroPage() {
 
                 <div>
                   <label className="text-xs font-bold uppercase tracking-wider text-slate-600 block mb-1.5">
-                    N�mero do CRECI
+                    Número do CRECI
                   </label>
                   <div className="relative">
                     <ShieldCheck className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -224,7 +224,7 @@ export default function CadastroPage() {
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div className="sm:col-span-2">
                   <label className="text-xs font-bold uppercase tracking-wider text-slate-600 block mb-1.5">
-                    WhatsApp (DDD + N�mero)
+                    WhatsApp (DDD + Número)
                   </label>
                   <div className="relative">
                     <Phone className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -257,7 +257,7 @@ export default function CadastroPage() {
               {/* Link Exclusivo (Slug) */}
               <div className="pt-2">
                 <label className="text-xs font-bold uppercase tracking-wider text-slate-600 block mb-1.5">
-                  Seu Link Exclusivo do Cat�logo
+                  Seu Link Exclusivo do Catálogo
                 </label>
                 <div className="flex items-center rounded-xl bg-slate-50 border border-slate-200 overflow-hidden px-3 py-1 focus-within:ring-2 focus-within:ring-emerald-500">
                   <span className="text-xs text-slate-400 font-mono select-none">
@@ -279,13 +279,13 @@ export default function CadastroPage() {
                 disabled={loading}
                 className="w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold rounded-2xl flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/20 transition-all hover:scale-[1.02] active:scale-95 text-sm mt-4"
               >
-                <span>{loading ? 'Criando Conta...' : 'Criar Meu Cat�logo Gr�tis'}</span>
+                <span>{loading ? 'Criando Conta...' : 'Criar Meu Catálogo Grátis'}</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
             </form>
 
             <div className="pt-4 border-t border-slate-100 text-center text-xs text-slate-500">
-              J� possui uma conta?{' '}
+              Já possui uma conta?{' '}
               <Link href="/login" className="font-bold text-emerald-600 hover:underline">
                 Fazer Login
               </Link>

@@ -29,7 +29,7 @@ export default function LoginPage() {
         if (error) throw error;
         router.push('/dashboard');
       } else {
-        // Modo Demonstra��o / Local
+        // Modo Demonstração / Local
         setTimeout(() => {
           router.push('/dashboard');
         }, 500);
@@ -56,7 +56,7 @@ export default function LoginPage() {
               Acesse seu Painel
             </h1>
             <p className="text-xs text-slate-500">
-              Gerencie seus im�veis, visualize m�tricas e envie links no WhatsApp
+              Gerencie seus imóveis, visualize m²tricas e envie links no WhatsApp
             </p>
           </div>
 
@@ -64,9 +64,9 @@ export default function LoginPage() {
             <div className="p-3.5 rounded-2xl bg-amber-50 border border-amber-200 text-amber-800 text-xs flex items-start gap-2">
               <Sparkles className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
               <div>
-                <span className="font-bold">Modo de Teste / Demonstra��o Ativo:</span>
+                <span className="font-bold">Modo de Teste / Demonstração Ativo:</span>
                 <p className="text-amber-700 mt-0.5">
-                  Voc� pode digitar qualquer e-mail e senha para entrar no painel imediatamente.
+                  Você pode digitar qualquer e-mail e senha para entrar no painel imediatamente.
                 </p>
               </div>
             </div>
@@ -110,7 +110,7 @@ export default function LoginPage() {
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder="��������"
+                    placeholder=""
                     className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-xs rounded-xl pl-10 pr-3 py-3 focus:outline-none focus:ring-2 focus:ring-emerald-500 font-medium"
                     required
                   />
@@ -128,9 +128,9 @@ export default function LoginPage() {
             </form>
 
             <div className="pt-4 border-t border-slate-100 text-center text-xs text-slate-500">
-              Ainda n�o tem sua conta?{' '}
+              Ainda não tem sua conta?{' '}
               <Link href="/cadastro" className="font-bold text-emerald-600 hover:underline">
-                Criar Meu Cat�logo Gr�tis
+                Criar Meu Catálogo Grátis
               </Link>
             </div>
           </div>

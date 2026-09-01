@@ -54,7 +54,7 @@ export default function PropertyDetailPage() {
   if (!broker || !property) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50 text-slate-500">
-        Carregando detalhes do im�vel...
+        Carregando detalhes do imóvel...
       </div>
     );
   }
@@ -73,7 +73,7 @@ export default function PropertyDetailPage() {
               className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-600 hover:text-slate-900 transition-colors"
             >
               <ArrowLeft className="w-4 h-4" />
-              <span>Ver todos os im�veis de {broker.name}</span>
+              <span>Ver todos os imóveis de {broker.name}</span>
             </Link>
 
             <div className="flex items-center gap-2">
@@ -104,7 +104,7 @@ export default function PropertyDetailPage() {
             <div className="space-y-2">
               <div className="flex flex-wrap items-center gap-2">
                 <span className="px-3 py-1 bg-slate-900 text-white text-xs font-bold uppercase tracking-wider rounded-lg">
-                  {property.type} � {property.purpose}
+                  {property.type} • {property.purpose}
                 </span>
                 <span className="px-2.5 py-1 bg-emerald-100 text-emerald-800 text-xs font-mono font-bold rounded-lg">
                   Ref: {property.code}
@@ -135,7 +135,7 @@ export default function PropertyDetailPage() {
                 {formatCurrency(property.price)}
               </div>
               <div className="text-xs text-slate-500 font-medium mt-1 flex md:justify-end gap-3">
-                {property.condoFee && <span>Cond.: {formatCurrency(property.condoFee)}/m�s</span>}
+                {property.condoFee && <span>Cond.: {formatCurrency(property.condoFee)}/m²s</span>}
                 {property.iptu && <span>IPTU: {formatCurrency(property.iptu)}/ano</span>}
               </div>
             </div>
@@ -155,7 +155,7 @@ export default function PropertyDetailPage() {
               {/* Main Specifications Bar */}
               <div className="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-sm">
                 <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-4">
-                  Especifica��es Principais
+                  Especificações Principais
                 </h3>
 
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
@@ -164,8 +164,8 @@ export default function PropertyDetailPage() {
                       <Square className="w-5 h-5" />
                     </div>
                     <div>
-                      <div className="text-[11px] text-slate-500 font-semibold">�rea �til</div>
-                      <div className="text-base font-black text-slate-900">{property.areaM2} m�</div>
+                      <div className="text-[11px] text-slate-500 font-semibold">Área Útil</div>
+                      <div className="text-base font-black text-slate-900">{property.areaM2} m²</div>
                     </div>
                   </div>
 
@@ -203,7 +203,7 @@ export default function PropertyDetailPage() {
 
               {/* Description */}
               <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-sm space-y-4">
-                <h3 className="text-lg font-black text-slate-900">Sobre o Im�vel</h3>
+                <h3 className="text-lg font-black text-slate-900">Sobre o Imóvel</h3>
                 <p className="text-slate-700 text-sm leading-relaxed whitespace-pre-line">
                   {property.description}
                 </p>
@@ -243,7 +243,7 @@ export default function PropertyDetailPage() {
                   <div>
                     <div className="font-bold">Corretor Credenciado e Verificado</div>
                     <p className="text-emerald-700 mt-0.5">
-                      Negocie direto com o profissional respons�vel ({broker.name} - CRECI {broker.creci}).
+                      Negocie direto com o profissional responsável ({broker.name} - CRECI {broker.creci}).
                     </p>
                   </div>
                 </div>

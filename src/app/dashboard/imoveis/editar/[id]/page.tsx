@@ -30,7 +30,7 @@ export default function EditPropertyPage() {
       <>
         <Header />
         <div className="max-w-4xl mx-auto p-12 text-center text-slate-500">
-          Carregando im�vel...
+          Carregando imóvel...
         </div>
         <Footer />
       </>
@@ -56,21 +56,21 @@ export default function EditPropertyPage() {
               className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-600 hover:text-slate-900 bg-white px-3 py-2 rounded-xl border border-slate-200 shadow-sm"
             >
               <ArrowLeft className="w-4 h-4" />
-              <span>Voltar aos Im�veis</span>
+              <span>Voltar aos Imóveis</span>
             </Link>
 
-            <h1 className="text-xl font-black text-slate-900">Editar Im�vel (Ref: {property.code})</h1>
+            <h1 className="text-xl font-black text-slate-900">Editar Imóvel (Ref: {property.code})</h1>
           </div>
 
           <form onSubmit={handleSubmit} className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-8">
             <div className="space-y-4">
               <h3 className="text-sm font-bold uppercase tracking-wider text-slate-900 pb-2 border-b border-slate-100">
-                Informa��es B�sicas
+                Informações Básicas
               </h3>
 
               <div>
                 <label className="text-xs font-bold uppercase tracking-wider text-slate-600 block mb-1.5">
-                  T�tulo do Im�vel
+                  Título do Imóvel
                 </label>
                 <input
                   type="text"
@@ -84,7 +84,7 @@ export default function EditPropertyPage() {
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
                   <label className="text-xs font-bold uppercase tracking-wider text-slate-600 block mb-1.5">
-                    Pre�o (R$)
+                    Preço (R$)
                   </label>
                   <input
                     type="number"
@@ -108,7 +108,7 @@ export default function EditPropertyPage() {
                 </div>
                 <div>
                   <label className="text-xs font-bold uppercase tracking-wider text-slate-600 block mb-1.5">
-                    �rea (m�)
+                    Área (m²)
                   </label>
                   <input
                     type="number"
@@ -123,7 +123,7 @@ export default function EditPropertyPage() {
 
             <div>
               <label className="text-xs font-bold uppercase tracking-wider text-slate-600 block mb-1.5">
-                Descri��o
+                Descrição
               </label>
               <textarea
                 rows={4}
@@ -140,7 +140,7 @@ export default function EditPropertyPage() {
                 className="px-8 py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-2xl flex items-center gap-2 shadow-lg shadow-emerald-600/20 transition-all hover:scale-105 active:scale-95"
               >
                 <Save className="w-4 h-4" />
-                <span>Salvar Altera��es</span>
+                <span>Salvar Alterações</span>
               </button>
             </div>
           </form>

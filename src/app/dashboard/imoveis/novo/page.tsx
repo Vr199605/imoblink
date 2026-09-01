@@ -27,7 +27,7 @@ export default function NewPropertyPage() {
   const [garageSpots, setGarageSpots] = useState<number>(1);
   const [areaM2, setAreaM2] = useState<number>(85);
   const [neighborhood, setNeighborhood] = useState('');
-  const [city, setCity] = useState(broker.city || 'S�o Paulo');
+  const [city, setCity] = useState(broker.city || 'São Paulo');
   const [state, setState] = useState(broker.state || 'SP');
   const [featured, setFeatured] = useState(false);
 
@@ -36,7 +36,7 @@ export default function NewPropertyPage() {
     'Varanda Gourmet',
     'Piscina',
     'Academia',
-    'Seguran�a 24h'
+    'Segurança 24h'
   ]);
 
   const [imageInput, setImageInput] = useState('');
@@ -70,7 +70,7 @@ export default function NewPropertyPage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim() || !neighborhood.trim()) {
-      alert('Por favor preencha o t�tulo e o bairro do im�vel.');
+      alert('Por favor preencha o título e o bairro do imóvel.');
       return;
     }
 
@@ -123,21 +123,21 @@ export default function NewPropertyPage() {
               className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-600 hover:text-slate-900 bg-white px-3 py-2 rounded-xl border border-slate-200 shadow-sm"
             >
               <ArrowLeft className="w-4 h-4" />
-              <span>Voltar aos Im�veis</span>
+              <span>Voltar aos Imóveis</span>
             </Link>
 
-            <h1 className="text-xl font-black text-slate-900">Cadastrar Novo Im�vel</h1>
+            <h1 className="text-xl font-black text-slate-900">Cadastrar Novo Imóvel</h1>
           </div>
 
           <form onSubmit={handleSubmit} className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-8">
             <div className="space-y-4">
               <h3 className="text-sm font-bold uppercase tracking-wider text-slate-900 pb-2 border-b border-slate-100">
-                1. Informa��es B�sicas
+                1. Informações Básicas
               </h3>
 
               <div>
                 <label className="text-xs font-bold uppercase tracking-wider text-slate-600 block mb-1.5">
-                  T�tulo do Im�vel (Chamativo)
+                  Título do Imóvel (Chamativo)
                 </label>
                 <input
                   type="text"
@@ -152,7 +152,7 @@ export default function NewPropertyPage() {
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
                   <label className="text-xs font-bold uppercase tracking-wider text-slate-600 block mb-1.5">
-                    Tipo de Im�vel
+                    Tipo de Imóvel
                   </label>
                   <select
                     value={type}
@@ -164,7 +164,7 @@ export default function NewPropertyPage() {
                     <option value="cobertura">Cobertura</option>
                     <option value="terreno">Terreno / Lote</option>
                     <option value="comercial">Comercial</option>
-                    <option value="chacara">Ch�cara / S�tio</option>
+                    <option value="chacara">Chácara / Sítio</option>
                   </select>
                 </div>
 
@@ -184,7 +184,7 @@ export default function NewPropertyPage() {
 
                 <div>
                   <label className="text-xs font-bold uppercase tracking-wider text-slate-600 block mb-1.5">
-                    Pre�o (R$)
+                    Preço (R$)
                   </label>
                   <input
                     type="number"
@@ -199,7 +199,7 @@ export default function NewPropertyPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="text-xs font-bold uppercase tracking-wider text-slate-600 block mb-1.5">
-                    Condom�nio Mensal (R$ opcional)
+                    Condom²nio Mensal (R$ opcional)
                   </label>
                   <input
                     type="number"
@@ -227,7 +227,7 @@ export default function NewPropertyPage() {
 
             <div className="space-y-4">
               <h3 className="text-sm font-bold uppercase tracking-wider text-slate-900 pb-2 border-b border-slate-100">
-                2. Localiza��o e Dimens�es
+                2. Localização e Dimensões
               </h3>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -275,7 +275,7 @@ export default function NewPropertyPage() {
 
               <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
                 <div>
-                  <label className="text-[11px] font-bold uppercase text-slate-600 block mb-1">�rea (m�)</label>
+                  <label className="text-[11px] font-bold uppercase text-slate-600 block mb-1">Área (m²)</label>
                   <input
                     type="number"
                     value={areaM2}
@@ -295,7 +295,7 @@ export default function NewPropertyPage() {
                   />
                 </div>
                 <div>
-                  <label className="text-[11px] font-bold uppercase text-slate-600 block mb-1">Su�tes</label>
+                  <label className="text-[11px] font-bold uppercase text-slate-600 block mb-1">Suítes</label>
                   <input
                     type="number"
                     value={suites}
@@ -329,18 +329,18 @@ export default function NewPropertyPage() {
 
             <div className="space-y-4">
               <h3 className="text-sm font-bold uppercase tracking-wider text-slate-900 pb-2 border-b border-slate-100">
-                3. Descri��o e Diferenciais
+                3. Descrição e Diferenciais
               </h3>
 
               <div>
                 <label className="text-xs font-bold uppercase tracking-wider text-slate-600 block mb-1.5">
-                  Descri��o Completa do Im�vel
+                  Descrição Completa do Imóvel
                 </label>
                 <textarea
                   rows={4}
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  placeholder="Destaque as qualidades do im�vel, acabamentos e diferenciais..."
+                  placeholder="Destaque as qualidades do imóvel, acabamentos e diferenciais..."
                   className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-xs rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-emerald-500"
                   required
                 />
@@ -391,7 +391,7 @@ export default function NewPropertyPage() {
 
             <div className="space-y-4">
               <h3 className="text-sm font-bold uppercase tracking-wider text-slate-900 pb-2 border-b border-slate-100">
-                4. Fotos do Im�vel
+                4. Fotos do Imóvel
               </h3>
 
               <div className="flex gap-2">
@@ -445,7 +445,7 @@ export default function NewPropertyPage() {
                   onChange={(e) => setFeatured(e.target.checked)}
                   className="w-4 h-4 text-emerald-600 rounded border-slate-300 focus:ring-emerald-500 accent-emerald-600"
                 />
-                <span className="text-xs font-bold text-slate-700">Destacar este im�vel no topo do cat�logo</span>
+                <span className="text-xs font-bold text-slate-700">Destacar este imóvel no topo do catálogo</span>
               </label>
 
               <button
@@ -453,7 +453,7 @@ export default function NewPropertyPage() {
                 className="px-8 py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-2xl flex items-center gap-2 shadow-lg shadow-emerald-600/20 transition-all hover:scale-105 active:scale-95"
               >
                 <Save className="w-4 h-4" />
-                <span>Publicar Im�vel</span>
+                <span>Publicar Imóvel</span>
               </button>
             </div>
           </form>

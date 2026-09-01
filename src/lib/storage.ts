@@ -8,7 +8,7 @@ const STORAGE_KEYS = {
 };
 
 // ==========================================
-// OPERA��ES DE PERFIL DO CORRETOR
+// OPERAÇÕES DE PERFIL DO CORRETOR
 // ==========================================
 
 export async function getBrokerProfileAsync(slug?: string): Promise<BrokerProfile> {
@@ -114,7 +114,7 @@ export function saveBrokerProfile(profile: BrokerProfile): void {
 }
 
 // ==========================================
-// OPERA��ES DE IM�VEIS
+// OPERAÇÕES DE IMÓVEIS
 // ==========================================
 
 export async function getPropertiesAsync(brokerSlug?: string): Promise<Property[]> {
