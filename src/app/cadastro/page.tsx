@@ -8,16 +8,17 @@ import Footer from '@/components/Footer';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase/client';
 import { saveBrokerProfile } from '@/lib/storage';
 import { generateSlug } from '@/lib/utils';
+import { KIWIFY_CHECKOUT_URL } from '@/lib/kiwify';
 import { BrokerProfile } from '@/types';
-import { 
-  Building2, 
-  Mail, 
-  Lock, 
-  User, 
-  ShieldCheck, 
-  Phone, 
-  ArrowRight, 
-  AlertCircle, 
+import {
+  Building2,
+  Mail,
+  Lock,
+  User,
+  ShieldCheck,
+  Phone,
+  ArrowRight,
+  AlertCircle,
   Sparkles,
   Link2
 } from 'lucide-react';
@@ -51,6 +52,26 @@ export default function CadastroPage() {
 
     try {
       if (isSupabaseConfigured && supabase) {
+        // 0. Só libera a criação de conta para quem já tem uma compra aprovada
+        // no Kiwify com esse mesmo e-mail (o webhook do Kiwify grava isso em
+        // public.purchases assim que o pagamento é confirmado).
+        const { data: hasPurchase, error: purchaseCheckError } = await supabase.rpc(
+          'has_active_purchase',
+          { check_email: email }
+        );
+
+        if (purchaseCheckError) {
+          throw new Error(
+            'Não foi possível confirmar seu pagamento agora. Tente novamente em instantes.'
+          );
+        }
+
+        if (!hasPurchase) {
+          throw new Error(
+            `Não encontramos um pagamento aprovado para o e-mail "${email}". Use o mesmo e-mail informado na compra, ou finalize seu pagamento em ${KIWIFY_CHECKOUT_URL} e tente novamente em alguns instantes.`
+          );
+        }
+
         // 1. Criar usuário no Supabase Auth
         const { data: authData, error: authError } = await supabase.auth.signUp({
           email,
@@ -135,9 +156,28 @@ export default function CadastroPage() {
             </p>
           </div>
 
+          {isSupabaseConfigured && (
+            <div className="p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-start gap-2">
+              <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+              <p>
+                O acesso ao painel é liberado após a confirmação do pagamento. Use aqui o{' '}
+                <strong>mesmo e-mail</strong> usado na hora da compra.{' '}
+                <a
+                  href={KIWIFY_CHECKOUT_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-bold underline"
+                >
+                  Ainda não comprei, quero assinar
+                </a>
+                .
+              </p>
+            </div>
+          )}
+
           {errorMessage && (
-            <div className="p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-semibold flex items-center gap-2">
-              <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+            <div className="p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-semibold flex items-start gap-2">
+              <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
               <span>{errorMessage}</span>
             </div>
           )}
