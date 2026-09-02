@@ -1,14 +1,15 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Property, PropertyType, PropertyPurpose } from '@/types';
 import { getBrokerProfile, saveProperty, getProperties } from '@/lib/storage';
+import { supabase, isSupabaseConfigured } from '@/lib/supabase/client';
 import { generateSlug } from '@/lib/utils';
-import { ArrowLeft, Save, Plus, X } from 'lucide-react';
+import { ArrowLeft, Save, Plus, X, Upload, Loader2 } from 'lucide-react';
 
 export default function NewPropertyPage() {
   const router = useRouter();
@@ -44,6 +45,9 @@ export default function NewPropertyPage() {
     'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&q=80&w=1200',
     'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&q=80&w=1200'
   ]);
+  const [uploadingPhotos, setUploadingPhotos] = useState(false);
+  const [uploadError, setUploadError] = useState('');
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const addTag = () => {
     if (tagInput.trim() && !tags.includes(tagInput.trim())) {
@@ -65,6 +69,55 @@ export default function NewPropertyPage() {
 
   const removeImage = (index: number) => {
     setImages(images.filter((_, i) => i !== index));
+  };
+
+  const readFileAsDataUrl = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = () => reject(reader.error);
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const uploadPropertyPhoto = async (file: File): Promise<string> => {
+    if (isSupabaseConfigured && supabase) {
+      try {
+        const ext = file.name.split('.').pop() || 'jpg';
+        const path = `${broker.slug || 'imoveis'}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+        const { error } = await supabase.storage.from('property-images').upload(path, file);
+        if (!error) {
+          const { data } = supabase.storage.from('property-images').getPublicUrl(path);
+          if (data?.publicUrl) return data.publicUrl;
+        }
+      } catch (e) {
+        console.warn('Supabase storage upload failed, using local fallback:', e);
+      }
+    }
+    return readFileAsDataUrl(file);
+  };
+
+  const handleFilesSelected = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    e.target.value = '';
+    if (files.length === 0) return;
+
+    const invalid = files.find((f) => !f.type.startsWith('image/'));
+    if (invalid) {
+      setUploadError('Selecione apenas arquivos de imagem (JPG, PNG, WEBP...).');
+      return;
+    }
+
+    setUploadError('');
+    setUploadingPhotos(true);
+    try {
+      const uploaded = await Promise.all(files.map(uploadPropertyPhoto));
+      setImages((prev) => [...prev, ...uploaded]);
+    } catch (e) {
+      setUploadError('Não foi possível carregar uma ou mais fotos. Tente novamente.');
+    } finally {
+      setUploadingPhotos(false);
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -393,6 +446,44 @@ export default function NewPropertyPage() {
               <h3 className="text-sm font-bold uppercase tracking-wider text-slate-900 pb-2 border-b border-slate-100">
                 4. Fotos do Imóvel
               </h3>
+
+              <div>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  onChange={handleFilesSelected}
+                  className="hidden"
+                />
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={uploadingPhotos}
+                  className="w-full flex items-center justify-center gap-2 px-4 py-4 border-2 border-dashed border-slate-300 hover:border-emerald-500 hover:bg-emerald-50/50 text-slate-600 hover:text-emerald-700 rounded-xl text-xs font-bold transition-colors disabled:opacity-60"
+                >
+                  {uploadingPhotos ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <span>Enviando fotos...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Upload className="w-4 h-4" />
+                      <span>Selecionar Fotos do Dispositivo</span>
+                    </>
+                  )}
+                </button>
+                {uploadError && (
+                  <p className="text-xs font-semibold text-rose-600 mt-1.5">{uploadError}</p>
+                )}
+              </div>
+
+              <div className="flex items-center gap-3">
+                <div className="h-px flex-1 bg-slate-200" />
+                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">ou cole uma URL</span>
+                <div className="h-px flex-1 bg-slate-200" />
+              </div>
 
               <div className="flex gap-2">
                 <input
