@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Property, BrokerProfile } from '@/types';
 import { formatCurrency, formatPhoneNumber, generateSlug } from '@/lib/utils';
-import { FileText, X, MapPin, Download, AlertCircle } from 'lucide-react';
+import { X, MapPin, AlertCircle, Loader2 } from 'lucide-react';
 
 interface PdfExportModalProps {
   isOpen: boolean;
@@ -16,13 +16,25 @@ export default function PdfExportModal({ isOpen, onClose, property, broker }: Pd
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const printAreaRef = useRef<HTMLDivElement>(null);
+  const startedRef = useRef(false);
 
-  if (!isOpen) return null;
+  // Assim que o botão "Baixar Ficha em PDF" é clicado (isOpen vira true), o
+  // PDF já é gerado e baixado direto — sem exibir nenhuma pré-visualização
+  // antes. A ficha em si é renderizada fora da tela, só para servir de
+  // "arte" para o html2canvas capturar.
+  useEffect(() => {
+    if (!isOpen) {
+      startedRef.current = false;
+      setError(null);
+      return;
+    }
+    if (startedRef.current) return;
+    startedRef.current = true;
+    generateAndDownload();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen]);
 
-  // Gera e baixa um arquivo PDF de verdade (sem depender da caixa de diálogo
-  // de impressão do navegador, que em alguns navegadores/apps abre uma nova
-  // aba/pré-visualização sem opção de fechar).
-  const handleDownloadPdf = async () => {
+  const generateAndDownload = async () => {
     if (!printAreaRef.current) return;
 
     setIsGenerating(true);
@@ -67,59 +79,52 @@ export default function PdfExportModal({ isOpen, onClose, property, broker }: Pd
 
       const fileName = `ficha-${generateSlug(property.code || property.title)}.pdf`;
       pdf.save(fileName);
+
+      setIsGenerating(false);
+      onClose();
     } catch (err) {
       console.error('Falha ao gerar PDF:', err);
-      setError('Não foi possível gerar o arquivo PDF. Tente novamente.');
-    } finally {
       setIsGenerating(false);
+      setError('Não foi possível gerar o arquivo PDF. Tente novamente.');
     }
   };
 
+  if (!isOpen) return null;
+
   return (
-    <div className="fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-md flex items-center justify-center p-2 sm:p-4 overflow-y-auto">
-      <div className="bg-white rounded-3xl max-w-3xl w-full p-6 shadow-2xl border border-slate-100 my-8">
-        <div className="flex items-center justify-between pb-4 border-b border-slate-100 no-print">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center">
-              <FileText className="w-4 h-4" />
+    <>
+      {/* Indicador de progresso / erro. Fica no canto da tela e nunca
+          bloqueia a navegação — some sozinho assim que o download começa. */}
+      {(isGenerating || error) && (
+        <div className="fixed bottom-4 right-4 left-4 sm:left-auto z-50 sm:max-w-sm no-print">
+          {isGenerating && (
+            <div className="flex items-center gap-3 bg-slate-900 text-white px-4 py-3 rounded-xl shadow-2xl">
+              <Loader2 className="w-4 h-4 animate-spin shrink-0" />
+              <span className="text-sm font-semibold">Gerando PDF da ficha...</span>
             </div>
-            <div>
-              <h3 className="font-bold text-slate-900 text-lg">Ficha Comercial do Imóvel (PDF)</h3>
-              <p className="text-xs text-slate-500">Pronta para baixar e enviar ao cliente</p>
+          )}
+          {error && (
+            <div className="flex items-start gap-2 bg-white border border-red-200 text-red-700 px-4 py-3 rounded-xl shadow-2xl">
+              <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+              <span className="text-xs flex-1">{error}</span>
+              <button
+                onClick={onClose}
+                aria-label="Fechar"
+                className="text-red-400 hover:text-red-700 shrink-0"
+              >
+                <X className="w-4 h-4" />
+              </button>
             </div>
-          </div>
-          <button
-            onClick={onClose}
-            aria-label="Fechar"
-            className="p-1.5 text-slate-400 hover:text-slate-700 rounded-lg hover:bg-slate-100"
-          >
-            <X className="w-5 h-5" />
-          </button>
+          )}
         </div>
+      )}
 
-        {/* Action Bar */}
-        <div className="flex gap-3 my-4 no-print">
-          <button
-            onClick={handleDownloadPdf}
-            disabled={isGenerating}
-            className="flex-1 py-3 bg-slate-900 hover:bg-slate-800 disabled:opacity-60 text-white font-bold rounded-xl flex items-center justify-center gap-2 shadow-lg transition-all"
-          >
-            <Download className="w-4 h-4" />
-            <span>{isGenerating ? 'Gerando PDF...' : 'Baixar Ficha em PDF'}</span>
-          </button>
-        </div>
-
-        {error && (
-          <div className="no-print mb-4 flex items-start gap-2 p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs">
-            <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
-            <span>{error}</span>
-          </div>
-        )}
-
-        {/* Printable PDF Sheet */}
+      {/* Ficha renderizada fora da área visível da tela — usada apenas como
+          fonte para gerar a imagem/PDF, nunca é exibida ao usuário. */}
+      <div className="fixed top-0 left-[-9999px]" aria-hidden="true">
         <div
           ref={printAreaRef}
-          className="print-area border border-slate-200 rounded-2xl p-6 bg-white shadow-sm space-y-6 text-slate-800"
+          className="w-[768px] border border-slate-200 rounded-2xl p-6 bg-white shadow-sm space-y-6 text-slate-800"
         >
           {/* Header */}
           <div className="flex justify-between items-center pb-4 border-b-2 border-slate-900">
@@ -226,6 +231,6 @@ export default function PdfExportModal({ isOpen, onClose, property, broker }: Pd
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
