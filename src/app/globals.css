@@ -25,6 +25,27 @@
   .print-only {
     display: block !important;
   }
+
+  /* Only the PDF sheet should be printed — everything else on the page
+     (header, property page content, other modals, footer, etc.) is
+     hidden so it doesn't generate extra/duplicated printed pages. */
+  body * {
+    visibility: hidden;
+  }
+  .print-area,
+  .print-area * {
+    visibility: visible;
+  }
+  .print-area {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    border: none;
+    box-shadow: none;
+  }
 }
 
 .custom-scrollbar::-webkit-scrollbar {

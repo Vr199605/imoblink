@@ -62,7 +62,7 @@ export default function PdfExportModal({ isOpen, onClose, property, broker }: Pd
         {/* Printable PDF Sheet */}
         <div
           ref={printAreaRef}
-          className="border border-slate-200 rounded-2xl p-6 bg-white shadow-sm space-y-6 text-slate-800"
+          className="print-area border border-slate-200 rounded-2xl p-6 bg-white shadow-sm space-y-6 text-slate-800"
         >
           {/* Header */}
           <div className="flex justify-between items-center pb-4 border-b-2 border-slate-900">
