@@ -3,7 +3,7 @@
 import React, { useRef, useState } from 'react';
 import { Property, BrokerProfile } from '@/types';
 import { formatCurrency, formatPhoneNumber, generateSlug } from '@/lib/utils';
-import { FileText, X, Printer, MapPin, Download, AlertCircle } from 'lucide-react';
+import { FileText, X, MapPin, Download, AlertCircle } from 'lucide-react';
 
 interface PdfExportModalProps {
   isOpen: boolean;
@@ -69,14 +69,10 @@ export default function PdfExportModal({ isOpen, onClose, property, broker }: Pd
       pdf.save(fileName);
     } catch (err) {
       console.error('Falha ao gerar PDF:', err);
-      setError('Não foi possível gerar o arquivo PDF. Você pode tentar imprimir a ficha como alternativa.');
+      setError('Não foi possível gerar o arquivo PDF. Tente novamente.');
     } finally {
       setIsGenerating(false);
     }
-  };
-
-  const handlePrint = () => {
-    window.print();
   };
 
   return (
@@ -89,7 +85,7 @@ export default function PdfExportModal({ isOpen, onClose, property, broker }: Pd
             </div>
             <div>
               <h3 className="font-bold text-slate-900 text-lg">Ficha Comercial do Imóvel (PDF)</h3>
-              <p className="text-xs text-slate-500">Pronta para baixar ou imprimir e enviar ao cliente</p>
+              <p className="text-xs text-slate-500">Pronta para baixar e enviar ao cliente</p>
             </div>
           </div>
           <button
@@ -102,7 +98,7 @@ export default function PdfExportModal({ isOpen, onClose, property, broker }: Pd
         </div>
 
         {/* Action Bar */}
-        <div className="flex flex-col sm:flex-row gap-3 my-4 no-print">
+        <div className="flex gap-3 my-4 no-print">
           <button
             onClick={handleDownloadPdf}
             disabled={isGenerating}
@@ -110,14 +106,6 @@ export default function PdfExportModal({ isOpen, onClose, property, broker }: Pd
           >
             <Download className="w-4 h-4" />
             <span>{isGenerating ? 'Gerando PDF...' : 'Baixar Ficha em PDF'}</span>
-          </button>
-          <button
-            onClick={handlePrint}
-            disabled={isGenerating}
-            className="sm:flex-none py-3 px-5 bg-slate-100 hover:bg-slate-200 disabled:opacity-60 text-slate-700 font-bold rounded-xl flex items-center justify-center gap-2 transition-all"
-          >
-            <Printer className="w-4 h-4" />
-            <span>Imprimir</span>
           </button>
         </div>
 
