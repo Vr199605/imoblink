@@ -6,19 +6,38 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     console.log('[Kiwify Webhook] Event received:', JSON.stringify(body, null, 2));
 
-    const orderStatus = body.order_status; // 'paid', 'refunded', 'chargedback', 'waiting_payment'
-    const customer = body.Customer || {};
-    const customerEmail = customer.email;
-
-    if (!customerEmail) {
-      return NextResponse.json({ message: 'No customer email provided' }, { status: 400 });
-    }
+    const orderId = body.order_id || body.id || 'test_' + Date.now();
+    const orderStatus = body.order_status || 'paid';
+    const customer = body.Customer || body.customer || {};
+    const customerEmail = customer.email || 'sem-email@kiwify.com';
+    const customerName = customer.full_name || customer.name || 'Cliente Kiwify';
+    const customerPhone = customer.mobile || customer.phone || '';
+    const product = body.Product || body.product || {};
+    const productName = product.product_name || product.name || 'ImobLink Pro';
+    const paymentMethod = body.payment_method || 'pix';
 
     if (isSupabaseConfigured && supabase) {
-      if (orderStatus === 'paid') {
-        console.log('[Kiwify Webhook] Payment APPROVED for: ' + customerEmail);
+      // 1. Salvar o pedido/teste na tabela public.orders
+      const { error: orderError } = await supabase.from('orders').insert([
+        {
+          order_id: String(orderId),
+          order_status: String(orderStatus),
+          customer_name: customerName,
+          customer_email: customerEmail,
+          customer_phone: customerPhone,
+          product_name: productName,
+          payment_method: paymentMethod
+        }
+      ]);
 
-        // 1. Verificar se o perfil do corretor já existe pelo email
+      if (orderError) {
+        console.error('[Kiwify Webhook] Error inserting into orders table:', orderError);
+      } else {
+        console.log('[Kiwify Webhook] Order saved to Supabase orders table successfully!');
+      }
+
+      // 2. Se for pedido aprovado ('paid'), atualizar perfil existente se já estiver cadastrado
+      if (orderStatus === 'paid') {
         const { data: existingProfile } = await supabase
           .from('profiles')
           .select('*')
@@ -26,24 +45,19 @@ export async function POST(req: NextRequest) {
           .single();
 
         if (existingProfile) {
-          // Atualizar perfil existente como ativo
           await supabase
             .from('profiles')
             .update({
-              bio: existingProfile.bio || 'Corretor com acesso Pro liberado.'
+              bio: existingProfile.bio || 'Corretor com acesso Pro liberado via Kiwify.'
             })
             .eq('id', existingProfile.id);
-        } else {
-          console.log('[Kiwify Webhook] User ' + customerEmail + ' paid and will register on /cadastro');
         }
-      } else if (orderStatus === 'refunded' || orderStatus === 'chargedback') {
-        console.log('[Kiwify Webhook] Payment REVOKED (' + orderStatus + ') for: ' + customerEmail);
       }
     }
 
-    // A Kiwify exige retorno HTTP 200 para confirmar recebimento
     return NextResponse.json({
       received: true,
+      order_id: orderId,
       status: orderStatus,
       email: customerEmail
     }, { status: 200 });
@@ -59,6 +73,7 @@ export async function POST(req: NextRequest) {
 export async function GET() {
   return NextResponse.json({
     status: 'Webhook endpoint active',
-    service: 'ImobLink Kiwify Integration'
+    service: 'ImobLink Kiwify Integration',
+    orders_table_support: true
   });
 }
