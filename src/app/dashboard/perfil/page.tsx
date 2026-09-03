@@ -8,33 +8,160 @@ import Footer from '@/components/Footer';
 import { BrokerProfile } from '@/types';
 import { getBrokerProfile, saveBrokerProfile } from '@/lib/storage';
 import { generateSlug } from '@/lib/utils';
-import { ArrowLeft, Save, CheckCircle2, User, ShieldCheck, Phone, Mail, Instagram, MapPin } from 'lucide-react';
+import { supabase, isSupabaseConfigured } from '@/lib/supabase/client';
+import { 
+  ArrowLeft, 
+  Save, 
+  CheckCircle2, 
+  User, 
+  ShieldCheck, 
+  Phone, 
+  Mail, 
+  Instagram, 
+  MapPin, 
+  Camera, 
+  Upload, 
+  Link as LinkIcon, 
+  AlertCircle 
+} from 'lucide-react';
 
 export default function ProfileSettingsPage() {
   const router = useRouter();
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
   const [profile, setProfile] = useState<BrokerProfile | null>(null);
   const [savedSuccess, setSavedSuccess] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [showUrlInput, setShowUrlInput] = useState(false);
+  const [uploadError, setUploadError] = useState('');
 
   useEffect(() => {
-    setProfile(getBrokerProfile());
+    async function loadProfile() {
+      if (isSupabaseConfigured && supabase) {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session) {
+          const { data: dbProfile } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', session.user.id)
+            .single();
+
+          if (dbProfile) {
+            setProfile({
+              id: dbProfile.id,
+              slug: dbProfile.slug,
+              name: dbProfile.name,
+              creci: dbProfile.creci,
+              phone: dbProfile.phone,
+              email: dbProfile.email,
+              avatarUrl: dbProfile.avatar_url || 'https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&q=80&w=400',
+              bio: dbProfile.bio || '',
+              instagram: dbProfile.instagram || '',
+              city: dbProfile.city || 'São Paulo',
+              state: dbProfile.state || 'SP'
+            });
+            return;
+          }
+        }
+      }
+      setProfile(getBrokerProfile());
+    }
+
+    loadProfile();
   }, []);
 
   if (!profile) return null;
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!profile) return;
+  const handleAvatarFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
 
-    // Update slug if name changed
-    const updatedProfile: BrokerProfile = {
-      ...profile,
-      slug: generateSlug(profile.name)
+    if (!file.type.startsWith('image/')) {
+      setUploadError('Por favor, selecione um arquivo de imagem válido (JPG, PNG ou WEBP).');
+      return;
+    }
+
+    setUploadError('');
+    const reader = new FileReader();
+
+    reader.onload = (event) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const maxDim = 500;
+        let width = img.width;
+        let height = img.height;
+
+        if (width > height) {
+          if (width > maxDim) {
+            height = Math.round((height * maxDim) / width);
+            width = maxDim;
+          }
+        } else {
+          if (height > maxDim) {
+            width = Math.round((width * maxDim) / height);
+            height = maxDim;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.drawImage(img, 0, 0, width, height);
+          const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.85);
+          setProfile((prev) => prev ? { ...prev, avatarUrl: compressedDataUrl } : null);
+        }
+      };
+
+      if (event.target?.result) {
+        img.src = event.target.result as string;
+      }
     };
 
-    saveBrokerProfile(updatedProfile);
-    setProfile(updatedProfile);
-    setSavedSuccess(true);
-    setTimeout(() => setSavedSuccess(false), 3000);
+    reader.readAsDataURL(file);
+    e.target.value = '';
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!profile) return;
+    setSaving(true);
+
+    const updatedProfile: BrokerProfile = {
+      ...profile,
+      slug: profile.slug || generateSlug(profile.name)
+    };
+
+    try {
+      saveBrokerProfile(updatedProfile);
+      setProfile(updatedProfile);
+
+      if (isSupabaseConfigured && supabase) {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session) {
+          await supabase
+            .from('profiles')
+            .update({
+              name: updatedProfile.name,
+              creci: updatedProfile.creci,
+              phone: updatedProfile.phone,
+              avatar_url: updatedProfile.avatarUrl,
+              bio: updatedProfile.bio,
+              instagram: updatedProfile.instagram,
+              city: updatedProfile.city,
+              state: updatedProfile.state
+            })
+            .eq('id', session.user.id);
+        }
+      }
+
+      setSavedSuccess(true);
+      setTimeout(() => setSavedSuccess(false), 3000);
+    } catch (err) {
+      console.error('Erro ao salvar perfil:', err);
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -59,32 +186,87 @@ export default function ProfileSettingsPage() {
           {savedSuccess && (
             <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold flex items-center gap-2 animate-in fade-in">
               <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-              <span>Perfil e dados atualizados com sucesso!</span>
+              <span>Perfil e foto atualizados com sucesso!</span>
+            </div>
+          )}
+
+          {uploadError && (
+            <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-bold flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 text-rose-600" />
+              <span>{uploadError}</span>
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-6">
             
-            {/* Avatar preview and URL */}
-            <div className="flex items-center gap-6 pb-6 border-b border-slate-100">
-              <img
-                src={profile.avatarUrl}
-                alt={profile.name}
-                className="w-20 h-20 rounded-2xl object-cover border-2 border-emerald-500 shadow-md"
-              />
-              <div className="flex-1 space-y-1.5">
-                <label className="text-xs font-bold uppercase tracking-wider text-slate-600">
-                  URL da Foto de Perfil
-                </label>
-                <input
-                  type="url"
-                  value={profile.avatarUrl}
-                  onChange={(e) => setProfile({ ...profile, avatarUrl: e.target.value })}
-                  placeholder="https://suafoto.com/avatar.jpg"
-                  className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-xs rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                  required
-                />
-                <p className="text-[11px] text-slate-400">Cole o link da sua foto profissional ou use o padrão.</p>
+            {/* Foto de Perfil com Upload Direto */}
+            <div className="pb-6 border-b border-slate-100">
+              <label className="text-xs font-bold uppercase tracking-wider text-slate-600 block mb-3">
+                Foto do Perfil Profissional
+              </label>
+
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5">
+                <div className="relative group shrink-0">
+                  <img
+                    src={profile.avatarUrl}
+                    alt={profile.name}
+                    className="w-24 h-24 rounded-2xl object-cover border-2 border-emerald-500 shadow-md bg-slate-100"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="absolute inset-0 bg-black/40 text-white rounded-2xl opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center gap-1 transition-opacity text-[11px] font-bold"
+                  >
+                    <Camera className="w-5 h-5" />
+                    <span>Trocar</span>
+                  </button>
+                </div>
+
+                <div className="flex-1 space-y-2.5">
+                  <div className="flex flex-wrap items-center gap-2.5">
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/png, image/jpeg, image/jpg, image/webp"
+                      onChange={handleAvatarFileUpload}
+                      className="hidden"
+                    />
+
+                    <button
+                      type="button"
+                      onClick={() => fileInputRef.current?.click()}
+                      className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-extrabold rounded-xl flex items-center gap-2 shadow-md shadow-emerald-600/20 transition-all hover:scale-[1.02] active:scale-95"
+                    >
+                      <Upload className="w-4 h-4" />
+                      <span>Escolher Foto do Computador / Celular</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setShowUrlInput(!showUrlInput)}
+                      className="px-3 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl flex items-center gap-1.5 transition-colors"
+                    >
+                      <LinkIcon className="w-3.5 h-3.5" />
+                      <span>{showUrlInput ? 'Ocultar Link' : 'Colar Link'}</span>
+                    </button>
+                  </div>
+
+                  <p className="text-[11px] text-slate-500">
+                    Selecione uma foto sua de frente. O sistema ajusta automaticamente o tamanho e a nitidez.
+                  </p>
+
+                  {showUrlInput && (
+                    <div className="pt-2 animate-in fade-in">
+                      <input
+                        type="url"
+                        value={profile.avatarUrl}
+                        onChange={(e) => setProfile({ ...profile, avatarUrl: e.target.value })}
+                        placeholder="https://suafoto.com/avatar.jpg"
+                        className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-xs rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-emerald-500 font-mono"
+                      />
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
 
