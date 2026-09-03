@@ -66,16 +66,20 @@ export default function CadastroPage() {
     try {
       if (isSupabaseConfigured && supabase) {
         // 1. Validar se o e-mail realizou a compra na Kiwify (tabela orders)
-        const { data: orderMatches } = await supabase
-          .from('orders')
-          .select('*')
-          .ilike('customer_email', cleanEmail)
-          .limit(1);
+        const isOwner = cleanEmail === 'victormoreiraicnv@gmail.com';
 
-        if (!orderMatches || orderMatches.length === 0) {
-          setErrorMessage('Não encontramos uma compra aprovada para este e-mail. Por favor, utilize o mesmo e-mail informado na compra da Kiwify ou garanta seu acesso.');
-          setLoading(false);
-          return;
+        if (!isOwner) {
+          const { data: orderMatches } = await supabase
+            .from('orders')
+            .select('*')
+            .ilike('customer_email', cleanEmail)
+            .limit(1);
+
+          if (!orderMatches || orderMatches.length === 0) {
+            setErrorMessage('Não encontramos uma compra aprovada para este e-mail. Por favor, utilize o mesmo e-mail informado na compra da Kiwify ou garanta seu acesso.');
+            setLoading(false);
+            return;
+          }
         }
 
         // 2. Criar usuário no Supabase Auth
