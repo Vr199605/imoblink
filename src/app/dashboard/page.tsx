@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Property, BrokerProfile } from '@/types';
-import { getBrokerProfile, getProperties, deleteProperty } from '@/lib/storage';
+import { getBrokerProfile, getProperties, deleteProperty, updatePropertyStatus } from '@/lib/storage';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase/client';
 import { formatCurrency } from '@/lib/utils';
 import { 
@@ -23,7 +23,9 @@ import {
   TrendingUp, 
   Users,
   Search,
-  Filter
+  Filter,
+  MessageCircle,
+  QrCode
 } from 'lucide-react';
 import ShareModal from '@/components/ShareModal';
 
@@ -36,6 +38,11 @@ export default function DashboardPage() {
   const [copiedCatalog, setCopiedCatalog] = useState(false);
   const [activeShareProperty, setActiveShareProperty] = useState<Property | null>(null);
   const [loadingAuth, setLoadingAuth] = useState(true);
+
+  const handleStatusChange = async (id: string, newStatus: Property['status']) => {
+    await updatePropertyStatus(id, newStatus);
+    setProperties((prev) => prev.map(p => p.id === id ? { ...p, status: newStatus } : p));
+  };
 
   useEffect(() => {
     async function checkAuth() {
@@ -238,12 +245,14 @@ export default function DashboardPage() {
             </div>
 
             <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center">
-                <Users className="w-6 h-6" />
+              <div className="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center">
+                <MessageCircle className="w-6 h-6" />
               </div>
               <div>
-                <div className="text-xs text-slate-500 font-semibold">Leads Recebidos</div>
-                <div className="text-2xl font-black text-slate-900">{broker.leadsTotal || 64}</div>
+                <div className="text-xs text-slate-500 font-semibold">Leads no WhatsApp</div>
+                <div className="text-2xl font-black text-slate-900">
+                  {properties.reduce((acc, p) => acc + (p.leadsCount || 0), 0) + (broker.leadsTotal || 0)}
+                </div>
               </div>
             </div>
           </div>
@@ -322,18 +331,44 @@ export default function DashboardPage() {
                           alt={prop.title}
                           className="w-full h-full object-cover"
                         />
-                        <div className="absolute top-2 left-2 flex gap-1">
-                          <span className="px-2 py-0.5 text-[10px] font-bold rounded bg-black/70 text-white uppercase">
-                            {prop.type}
-                          </span>
-                          <span className="px-2 py-0.5 text-[10px] font-mono font-bold rounded bg-emerald-600 text-white">
+                        <div className="absolute top-2 left-2 flex flex-wrap gap-1 z-10">
+                          {prop.status === 'vendido' ? (
+                            <span className="px-2 py-0.5 text-[10px] font-black rounded bg-amber-400 text-slate-950 uppercase tracking-wider shadow">
+                              🏆 VENDIDO
+                            </span>
+                          ) : prop.status === 'reservado' ? (
+                            <span className="px-2 py-0.5 text-[10px] font-bold rounded bg-amber-600 text-white uppercase shadow">
+                              RESERVADO
+                            </span>
+                          ) : (
+                            <span className="px-2 py-0.5 text-[10px] font-bold rounded bg-black/70 text-white uppercase">
+                              {prop.type}
+                            </span>
+                          )}
+                          <span className="px-2 py-0.5 text-[10px] font-mono font-bold rounded bg-emerald-600 text-white shadow">
                             {prop.code}
                           </span>
+                          {prop.videoUrl && (
+                            <span className="px-2 py-0.5 text-[10px] font-bold rounded bg-rose-600 text-white shadow">
+                              ▶ Vídeo
+                            </span>
+                          )}
                         </div>
-                        <div className="absolute top-2 right-2 bg-black/70 backdrop-blur-sm text-white text-[11px] font-semibold px-2 py-0.5 rounded flex items-center gap-1">
-                          <Eye className="w-3 h-3 text-emerald-400" />
-                          <span>{prop.viewsCount || 0}</span>
+
+                        <div className="absolute top-2 right-2 flex gap-1 z-10">
+                          <div className="bg-black/75 backdrop-blur-sm text-white text-[10px] font-semibold px-2 py-0.5 rounded flex items-center gap-1 shadow">
+                            <Eye className="w-3 h-3 text-slate-300" />
+                            <span>{prop.viewsCount || 0}</span>
+                          </div>
+                          <div className="bg-emerald-600/90 backdrop-blur-sm text-white text-[10px] font-bold px-2 py-0.5 rounded flex items-center gap-1 shadow">
+                            <MessageCircle className="w-3 h-3 fill-white" />
+                            <span>{prop.leadsCount || 0}</span>
+                          </div>
                         </div>
+
+                        {prop.status === 'vendido' && (
+                          <div className="absolute inset-0 bg-slate-950/20 backdrop-blur-[0.5px]" />
+                        )}
                       </div>
 
                       <div className="p-4">
@@ -349,6 +384,26 @@ export default function DashboardPage() {
                         <div className="text-xs text-slate-500 mt-1">
                           {prop.areaM2}m² • {prop.bedrooms} qts ({prop.suites} stes) • {prop.garageSpots} vg
                         </div>
+
+                        {/* Quick Status Selector */}
+                        <div className="mt-3 pt-2 border-t border-slate-100 flex items-center justify-between gap-2">
+                          <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Status:</span>
+                          <select
+                            value={prop.status}
+                            onChange={(e) => handleStatusChange(prop.id, e.target.value as any)}
+                            className={`text-xs font-bold px-2.5 py-1 rounded-lg border outline-none cursor-pointer transition-colors ${
+                              prop.status === 'vendido'
+                                ? 'bg-amber-100 text-amber-900 border-amber-300'
+                                : prop.status === 'reservado'
+                                ? 'bg-amber-50 text-amber-700 border-amber-200'
+                                : 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                            }`}
+                          >
+                            <option value="disponivel">🟢 Disponível</option>
+                            <option value="reservado">🟡 Reservado</option>
+                            <option value="vendido">🏆 Vendido</option>
+                          </select>
+                        </div>
                       </div>
                     </div>
 
@@ -357,9 +412,16 @@ export default function DashboardPage() {
                         <button
                           onClick={() => setActiveShareProperty(prop)}
                           className="p-2 text-slate-600 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-colors"
-                          title="Compartilhar"
+                          title="Compartilhar & QR Code para Placa"
                         >
                           <Share2 className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => setActiveShareProperty(prop)}
+                          className="p-2 text-slate-600 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-colors"
+                          title="Gerar QR Code para Placa"
+                        >
+                          <QrCode className="w-4 h-4" />
                         </button>
                         <Link
                           href={`/c/${broker.slug}/${prop.slug}`}

@@ -3,6 +3,7 @@
 import React from 'react';
 import { Property, BrokerProfile } from '@/types';
 import { buildWhatsAppUrl, formatCurrency } from '@/lib/utils';
+import { incrementPropertyLead } from '@/lib/storage';
 import { MessageCircle, ShieldCheck, Clock } from 'lucide-react';
 
 interface WhatsAppCTAProps {
@@ -14,6 +15,10 @@ interface WhatsAppCTAProps {
 export default function WhatsAppCTA({ property, broker, variant = 'inline' }: WhatsAppCTAProps) {
   const defaultMessage = `Olá ${broker.name}! Gostei muito do imóvel "${property.title}" (Ref: ${property.code}) no valor de ${formatCurrency(property.price)} e gostaria de agendar uma visita!`;
   const whatsappUrl = buildWhatsAppUrl(broker.phone, defaultMessage);
+
+  const handleClick = () => {
+    incrementPropertyLead(property.id);
+  };
 
   if (variant === 'sticky') {
     return (
@@ -27,6 +32,7 @@ export default function WhatsAppCTA({ property, broker, variant = 'inline' }: Wh
             href={whatsappUrl}
             target="_blank"
             rel="noopener noreferrer"
+            onClick={handleClick}
             className="flex-1 py-3 px-4 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-bold text-sm rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/25 transition-all"
           >
             <MessageCircle className="w-5 h-5 fill-white" />
@@ -74,6 +80,7 @@ export default function WhatsAppCTA({ property, broker, variant = 'inline' }: Wh
         href={whatsappUrl}
         target="_blank"
         rel="noopener noreferrer"
+        onClick={handleClick}
         className="w-full py-4 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold rounded-2xl flex items-center justify-center gap-2.5 shadow-xl shadow-emerald-600/25 transition-all hover:scale-[1.02] active:scale-95 text-base"
       >
         <MessageCircle className="w-6 h-6 fill-white" />

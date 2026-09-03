@@ -121,6 +121,36 @@ export default function EditPropertyPage() {
               </div>
             </div>
 
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="text-xs font-bold uppercase tracking-wider text-slate-600 block mb-1.5">
+                  Status do Imóvel
+                </label>
+                <select
+                  value={property.status}
+                  onChange={(e) => setProperty({ ...property, status: e.target.value as any })}
+                  className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-xs rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-emerald-500 font-bold"
+                >
+                  <option value="disponivel">🟢 Disponível para Venda</option>
+                  <option value="reservado">🟡 Reservado (Em Proposta)</option>
+                  <option value="vendido">🏆 Vendido com Sucesso</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="text-xs font-bold uppercase tracking-wider text-slate-600 block mb-1.5">
+                  Link do Tour em Vídeo (YouTube / Reels)
+                </label>
+                <input
+                  type="url"
+                  value={property.videoUrl || ''}
+                  onChange={(e) => setProperty({ ...property, videoUrl: e.target.value })}
+                  placeholder="https://www.youtube.com/watch?v=..."
+                  className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-xs rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-emerald-500 font-mono"
+                />
+              </div>
+            </div>
+
             <div>
               <label className="text-xs font-bold uppercase tracking-wider text-slate-600 block mb-1.5">
                 Descrição

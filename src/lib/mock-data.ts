@@ -12,8 +12,9 @@ export const defaultBroker: BrokerProfile = {
   instagram: "@carlossilva.imoveis",
   city: "São Paulo",
   state: "SP",
+  themeColor: "emerald",
   viewsTotal: 1480,
-  leadsTotal: 64
+  leadsTotal: 61
 };
 
 export const defaultProperties: Property[] = [
@@ -48,7 +49,9 @@ export const defaultProperties: Property[] = [
     featured: true,
     code: "IB-101",
     createdAt: "2026-08-25T10:00:00Z",
-    viewsCount: 420
+    viewsCount: 420,
+    leadsCount: 18,
+    videoUrl: "https://www.youtube.com/watch?v=ScMzIvxBSi4"
   },
   {
     id: "prop-2",
@@ -58,7 +61,7 @@ export const defaultProperties: Property[] = [
     description: "Mansão moderna com arquitetura biofílica, pé direito duplo, ambientes integrados, área gourmet completa com churrasqueira e piscina com borda infinita. Energia solar instalada e automação residencial completa.",
     type: "casa",
     purpose: "venda",
-    status: "disponivel",
+    status: "vendido",
     price: 3400000,
     condoFee: 1400,
     iptu: 950,
@@ -81,7 +84,8 @@ export const defaultProperties: Property[] = [
     featured: true,
     code: "IB-102",
     createdAt: "2026-08-28T14:30:00Z",
-    viewsCount: 580
+    viewsCount: 580,
+    leadsCount: 31
   },
   {
     id: "prop-3",
@@ -91,7 +95,7 @@ export const defaultProperties: Property[] = [
     description: "Oportunidade perfeita para moradia ou renda com aluguel por temporada (Airbnb). Pronto para morar, marcenaria sob medida, eletrodomésticos em inox, fechadura eletrônica e varanda envidraçada.",
     type: "apartamento",
     purpose: "venda",
-    status: "disponivel",
+    status: "reservado",
     price: 590000,
     condoFee: 650,
     iptu: 180,
@@ -113,7 +117,8 @@ export const defaultProperties: Property[] = [
     featured: false,
     code: "IB-103",
     createdAt: "2026-08-30T09:15:00Z",
-    viewsCount: 310
+    viewsCount: 310,
+    leadsCount: 12
   },
   {
     id: "prop-4",

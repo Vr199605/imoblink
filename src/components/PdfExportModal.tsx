@@ -209,7 +209,7 @@ export default function PdfExportModal({ isOpen, onClose, property, broker }: Pd
             </div>
           </div>
 
-          {/* Footer Broker Info */}
+          {/* Footer Broker Info & QR Code */}
           <div className="pt-4 border-t-2 border-slate-900 flex justify-between items-center">
             <div className="flex items-center gap-3">
               <img
@@ -224,9 +224,22 @@ export default function PdfExportModal({ isOpen, onClose, property, broker }: Pd
                 <div className="text-xs text-slate-600">{formatPhoneNumber(broker.phone)} • {broker.email}</div>
               </div>
             </div>
-            <div className="text-right text-[10px] text-slate-400">
-              Imóvel sujeito a disponibilidade.<br />
-              Gerado via ImobLink Pro.
+
+            <div className="flex items-center gap-3">
+              <div className="text-right text-[10px] text-slate-500">
+                <div className="font-bold text-slate-800">Acesse no Celular</div>
+                <span>Escaneie para mais fotos<br />e simulação completa</span>
+              </div>
+              <img
+                src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(
+                  typeof window !== 'undefined'
+                    ? `${window.location.origin}/c/${broker.slug}/${property.slug}`
+                    : `https://imoblink.app/c/${broker.slug}/${property.slug}`
+                )}`}
+                alt="QR Code Imóvel"
+                crossOrigin="anonymous"
+                className="w-14 h-14 rounded-lg border border-slate-200 p-0.5 bg-white"
+              />
             </div>
           </div>
         </div>

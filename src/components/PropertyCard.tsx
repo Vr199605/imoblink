@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { Property, BrokerProfile } from '@/types';
 import { formatCurrency, buildWhatsAppUrl } from '@/lib/utils';
+import { incrementPropertyLead } from '@/lib/storage';
 import { Bed, Bath, Square, Car, MapPin, Share2, MessageCircle } from 'lucide-react';
 import ShareModal from './ShareModal';
 
@@ -31,18 +32,39 @@ export default function PropertyCard({ property, broker }: PropertyCardProps) {
             />
           </Link>
           
-          <div className="absolute top-3 left-3 flex flex-wrap gap-1.5">
-            <span className="px-2.5 py-1 text-xs font-bold rounded-lg bg-slate-900/80 backdrop-blur-md text-white shadow-sm uppercase tracking-wide">
-              {property.type}
-            </span>
-            {property.featured && (
+          <div className="absolute top-3 left-3 flex flex-wrap gap-1.5 z-10">
+            {property.status === 'vendido' ? (
+              <span className="px-2.5 py-1 text-xs font-black rounded-lg bg-amber-400 text-slate-950 shadow-md uppercase tracking-wider flex items-center gap-1">
+                🏆 VENDIDO
+              </span>
+            ) : property.status === 'reservado' ? (
+              <span className="px-2.5 py-1 text-xs font-black rounded-lg bg-amber-600 text-white shadow-md uppercase tracking-wider">
+                RESERVADO
+              </span>
+            ) : (
+              <span className="px-2.5 py-1 text-xs font-bold rounded-lg bg-slate-900/80 backdrop-blur-md text-white shadow-sm uppercase tracking-wide">
+                {property.type}
+              </span>
+            )}
+
+            {property.featured && property.status === 'disponivel' && (
               <span className="px-2.5 py-1 text-xs font-bold rounded-lg bg-emerald-600/90 backdrop-blur-md text-white shadow-sm flex items-center gap-1">
                 ★ Destaque
               </span>
             )}
+
+            {property.videoUrl && (
+              <span className="px-2 py-0.5 text-[11px] font-bold rounded-md bg-rose-600 text-white shadow-sm flex items-center gap-1">
+                ▶ Vídeo
+              </span>
+            )}
           </div>
 
-          <div className="absolute top-3 right-3 flex gap-1.5">
+          {property.status === 'vendido' && (
+            <div className="absolute inset-0 bg-slate-950/20 backdrop-blur-[0.5px] pointer-events-none" />
+          )}
+
+          <div className="absolute top-3 right-3 flex gap-1.5 z-10">
             <button
               onClick={() => setIsShareOpen(true)}
               className="w-8 h-8 rounded-full bg-white/90 backdrop-blur-md text-slate-700 hover:text-emerald-600 hover:bg-white flex items-center justify-center shadow-md transition-transform active:scale-95"
@@ -52,7 +74,7 @@ export default function PropertyCard({ property, broker }: PropertyCardProps) {
             </button>
           </div>
 
-          <div className="absolute bottom-3 left-3">
+          <div className="absolute bottom-3 left-3 z-10">
             <span className="px-2 py-0.5 text-[11px] font-mono font-semibold rounded bg-black/60 text-white backdrop-blur-sm">
               Ref: {property.code}
             </span>
@@ -127,6 +149,7 @@ export default function PropertyCard({ property, broker }: PropertyCardProps) {
               href={whatsappUrl}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => incrementPropertyLead(property.id)}
               className="flex items-center justify-center gap-1.5 py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all shadow-sm active:scale-95"
             >
               <MessageCircle className="w-4 h-4 fill-white" />

@@ -149,7 +149,8 @@ export default function ProfileSettingsPage() {
               bio: updatedProfile.bio,
               instagram: updatedProfile.instagram,
               city: updatedProfile.city,
-              state: updatedProfile.state
+              state: updatedProfile.state,
+              theme_color: updatedProfile.themeColor || 'emerald'
             })
             .eq('id', session.user.id);
         }
@@ -373,6 +374,42 @@ export default function ProfileSettingsPage() {
                   className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-xs rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-emerald-500 font-mono"
                   required
                 />
+              </div>
+            </div>
+
+            {/* Branding / Cor Principal do Catálogo */}
+            <div className="pb-6 border-b border-slate-100 space-y-3">
+              <div>
+                <label className="text-xs font-bold uppercase tracking-wider text-slate-600 block">
+                  Cor de Destaque do Catálogo (Branding)
+                </label>
+                <p className="text-[11px] text-slate-400 mt-0.5">
+                  Escolha a cor que melhor combina com a sua identidade visual ou imobiliária para botões e detalhes.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+                {[
+                  { id: 'emerald', name: 'Verde Esmeralda', bg: 'bg-emerald-600' },
+                  { id: 'blue', name: 'Azul Real', bg: 'bg-blue-600' },
+                  { id: 'amber', name: 'Dourado Luxo', bg: 'bg-amber-600' },
+                  { id: 'slate', name: 'Grafite Moderno', bg: 'bg-slate-900' },
+                  { id: 'rose', name: 'Vinho Elegante', bg: 'bg-rose-700' }
+                ].map((color) => (
+                  <button
+                    key={color.id}
+                    type="button"
+                    onClick={() => setProfile({ ...profile, themeColor: color.id as any })}
+                    className={`flex items-center gap-2.5 p-2.5 rounded-2xl border text-left transition-all ${
+                      (profile.themeColor || 'emerald') === color.id
+                        ? 'border-slate-900 bg-slate-50 ring-2 ring-slate-900/10 shadow-sm font-black'
+                        : 'border-slate-200 hover:border-slate-300'
+                    }`}
+                  >
+                    <span className={`w-5 h-5 rounded-full ${color.bg} shrink-0 shadow-sm`} />
+                    <span className="text-xs text-slate-800">{color.name}</span>
+                  </button>
+                ))}
               </div>
             </div>
 

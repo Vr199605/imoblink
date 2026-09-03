@@ -33,6 +33,7 @@ export async function getBrokerProfileAsync(slug?: string): Promise<BrokerProfil
             instagram: data.instagram,
             city: data.city,
             state: data.state,
+            themeColor: data.theme_color || 'emerald',
             viewsTotal: 0,
             leadsTotal: 0
           };
@@ -58,6 +59,7 @@ export async function getBrokerProfileAsync(slug?: string): Promise<BrokerProfil
               instagram: data.instagram,
               city: data.city,
               state: data.state,
+              themeColor: data.theme_color || 'emerald',
               viewsTotal: 0,
               leadsTotal: 0
             };
@@ -285,7 +287,9 @@ export async function getPropertyBySlugAsync(slug: string): Promise<Property | u
           featured: data.featured,
           code: data.code,
           createdAt: data.created_at,
-          viewsCount: data.views_count
+          viewsCount: data.views_count,
+          leadsCount: data.leads_count || 0,
+          videoUrl: data.video_url || undefined
         };
       }
     } catch (e) {
@@ -309,3 +313,52 @@ export function incrementPropertyView(id: string): void {
     localStorage.setItem(STORAGE_KEYS.PROPERTIES, JSON.stringify(list));
   }
 }
+
+export function incrementPropertyLead(id: string): void {
+  if (typeof window === 'undefined') return;
+  const list = getProperties();
+  const prop = list.find(p => p.id === id);
+  if (prop) {
+    prop.leadsCount = (prop.leadsCount || 0) + 1;
+    localStorage.setItem(STORAGE_KEYS.PROPERTIES, JSON.stringify(list));
+  }
+
+  // Incrementar leadsTotal do corretor
+  const broker = getBrokerProfile();
+  if (broker) {
+    broker.leadsTotal = (broker.leadsTotal || 0) + 1;
+    saveBrokerProfile(broker);
+  }
+
+  // Incrementar no Supabase se conectado
+  if (isSupabaseConfigured && supabase) {
+    (async () => {
+      try {
+        const { data } = await supabase.from('properties').select('leads_count').eq('id', id).single();
+        if (data) {
+          await supabase.from('properties').update({ leads_count: (data.leads_count || 0) + 1 }).eq('id', id);
+        }
+      } catch (err) {
+        console.warn('Erro ao incrementar lead no Supabase:', err);
+      }
+    })();
+  }
+}
+
+export async function updatePropertyStatus(id: string, status: Property['status']): Promise<void> {
+  const list = getProperties();
+  const prop = list.find(p => p.id === id);
+  if (prop) {
+    prop.status = status;
+    saveProperty(prop);
+  }
+
+  if (isSupabaseConfigured && supabase) {
+    try {
+      await supabase.from('properties').update({ status }).eq('id', id);
+    } catch (err) {
+      console.warn('Erro ao atualizar status no Supabase:', err);
+    }
+  }
+}
+

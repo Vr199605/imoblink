@@ -37,7 +37,11 @@ export interface Property {
   code: string; // Ex: IB-102
   createdAt: string;
   viewsCount?: number;
+  leadsCount?: number;
+  videoUrl?: string;
 }
+
+export type ThemeColor = 'emerald' | 'blue' | 'amber' | 'slate' | 'rose';
 
 export interface BrokerProfile {
   id: string;
@@ -51,6 +55,7 @@ export interface BrokerProfile {
   instagram?: string;
   city: string;
   state: string;
+  themeColor?: ThemeColor;
   viewsTotal?: number;
   leadsTotal?: number;
 }

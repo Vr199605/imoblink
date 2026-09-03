@@ -11,14 +11,15 @@ CREATE TABLE IF NOT EXISTS public.profiles (
   phone TEXT NOT NULL,
   email TEXT NOT NULL,
   avatar_url TEXT DEFAULT 'https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&q=80&w=400',
-  bio TEXT DEFAULT 'Corretor de im�veis credenciado.',
+  bio TEXT DEFAULT 'Corretor de imóveis credenciado.',
   instagram TEXT,
-  city TEXT DEFAULT 'S�o Paulo',
+  city TEXT DEFAULT 'São Paulo',
   state TEXT DEFAULT 'SP',
+  theme_color TEXT DEFAULT 'emerald',
   created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
--- 2. Tabela de Im�veis
+-- 2. Tabela de Imóveis
 CREATE TABLE IF NOT EXISTS public.properties (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   broker_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
@@ -46,10 +47,12 @@ CREATE TABLE IF NOT EXISTS public.properties (
   images TEXT[] DEFAULT '{}',
   featured BOOLEAN DEFAULT false,
   views_count INTEGER DEFAULT 0,
+  leads_count INTEGER DEFAULT 0,
+  video_url TEXT,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
--- 3. Habilitar Seguran�a por Linha (Row Level Security - RLS)
+-- 3. Habilitar Segurança por Linha (Row Level Security - RLS)
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.properties ENABLE ROW LEVEL SECURITY;
 

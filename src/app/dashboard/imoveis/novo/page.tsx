@@ -31,6 +31,7 @@ export default function NewPropertyPage() {
   const [city, setCity] = useState(broker.city || 'São Paulo');
   const [state, setState] = useState(broker.state || 'SP');
   const [featured, setFeatured] = useState(false);
+  const [videoUrl, setVideoUrl] = useState('');
 
   const [tagInput, setTagInput] = useState('');
   const [tags, setTags] = useState<string[]>([
@@ -156,7 +157,9 @@ export default function NewPropertyPage() {
       featured,
       code: `IB-${nextCodeNumber}`,
       createdAt: new Date().toISOString(),
-      viewsCount: 0
+      viewsCount: 0,
+      leadsCount: 0,
+      videoUrl: videoUrl.trim() || undefined
     };
 
     saveProperty(newProperty);
@@ -525,6 +528,23 @@ export default function NewPropertyPage() {
                     </span>
                   </div>
                 ))}
+              </div>
+
+              {/* Vídeo / Tour Virtual */}
+              <div className="pt-4 border-t border-slate-100">
+                <label className="text-xs font-bold uppercase tracking-wider text-slate-600 block mb-1">
+                  Tour em Vídeo do Imóvel (YouTube ou Reels)
+                </label>
+                <p className="text-[11px] text-slate-400 mb-2">
+                  Cole o link do vídeo do YouTube ou Reels. Um player de alta resolução será exibido automaticamente na página do imóvel.
+                </p>
+                <input
+                  type="url"
+                  value={videoUrl}
+                  onChange={(e) => setVideoUrl(e.target.value)}
+                  placeholder="Ex: https://www.youtube.com/watch?v=ScMzIvxBSi4"
+                  className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-xs rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-emerald-500 font-mono"
+                />
               </div>
             </div>
 

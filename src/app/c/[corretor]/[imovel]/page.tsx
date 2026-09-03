@@ -25,8 +25,18 @@ import {
   CheckCircle2, 
   ShieldCheck, 
   Eye,
-  Info
+  Info,
+  Video,
+  MessageCircle,
+  Play
 } from 'lucide-react';
+
+function getYouTubeEmbedUrl(url?: string): string | null {
+  if (!url) return null;
+  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+  const match = url.match(regExp);
+  return (match && match[2].length === 11) ? `https://www.youtube.com/embed/${match[2]}` : null;
+}
 
 export default function PropertyDetailPage() {
   const params = useParams();
@@ -103,15 +113,27 @@ export default function PropertyDetailPage() {
           <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div className="space-y-2">
               <div className="flex flex-wrap items-center gap-2">
-                <span className="px-3 py-1 bg-slate-900 text-white text-xs font-bold uppercase tracking-wider rounded-lg">
-                  {property.type} • {property.purpose}
-                </span>
+                {property.status === 'vendido' ? (
+                  <span className="px-3 py-1 bg-amber-400 text-slate-950 text-xs font-black uppercase tracking-wider rounded-lg shadow-sm flex items-center gap-1.5">
+                    🏆 VENDIDO COM SUCESSO
+                  </span>
+                ) : property.status === 'reservado' ? (
+                  <span className="px-3 py-1 bg-amber-600 text-white text-xs font-black uppercase tracking-wider rounded-lg shadow-sm">
+                    🔒 RESERVADO (PROPOSTA EM ANDAMENTO)
+                  </span>
+                ) : (
+                  <span className="px-3 py-1 bg-slate-900 text-white text-xs font-bold uppercase tracking-wider rounded-lg">
+                    {property.type} • {property.purpose}
+                  </span>
+                )}
+
                 <span className="px-2.5 py-1 bg-emerald-100 text-emerald-800 text-xs font-mono font-bold rounded-lg">
                   Ref: {property.code}
                 </span>
-                {property.featured && (
+
+                {property.featured && property.status === 'disponivel' && (
                   <span className="px-2.5 py-1 bg-amber-100 text-amber-800 text-xs font-bold rounded-lg">
-                    ? Oportunidade Exclusiva
+                    ★ Oportunidade Exclusiva
                   </span>
                 )}
               </div>
@@ -120,9 +142,21 @@ export default function PropertyDetailPage() {
                 {property.title}
               </h1>
 
-              <div className="flex items-center gap-2 text-xs sm:text-sm text-slate-500 font-medium">
-                <MapPin className="w-4 h-4 text-slate-400 shrink-0" />
-                <span>{property.neighborhood}, {property.city} - {property.state}</span>
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs sm:text-sm text-slate-500 font-medium">
+                <div className="flex items-center gap-1.5">
+                  <MapPin className="w-4 h-4 text-slate-400 shrink-0" />
+                  <span>{property.neighborhood}, {property.city} - {property.state}</span>
+                </div>
+                <div className="flex items-center gap-3 text-xs text-slate-400">
+                  <span className="flex items-center gap-1">
+                    <Eye className="w-3.5 h-3.5" />
+                    <span>{property.viewsCount || 0} visualizações</span>
+                  </span>
+                  <span className="flex items-center gap-1 text-emerald-600 font-semibold">
+                    <MessageCircle className="w-3.5 h-3.5 fill-emerald-600" />
+                    <span>{property.leadsCount || 0} interessados</span>
+                  </span>
+                </div>
               </div>
             </div>
 
@@ -200,6 +234,43 @@ export default function PropertyDetailPage() {
                   </div>
                 </div>
               </div>
+
+              {/* Tour em Vídeo do Imóvel */}
+              {property.videoUrl && (
+                <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-sm space-y-4">
+                  <div className="flex items-center gap-2 text-slate-900 font-black text-lg">
+                    <div className="w-8 h-8 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center">
+                      <Video className="w-4 h-4" />
+                    </div>
+                    <span>Tour em Vídeo do Imóvel</span>
+                  </div>
+
+                  {getYouTubeEmbedUrl(property.videoUrl) ? (
+                    <div className="relative aspect-video rounded-2xl overflow-hidden shadow-md bg-black">
+                      <iframe
+                        src={getYouTubeEmbedUrl(property.videoUrl)!}
+                        title={`Tour em vídeo: ${property.title}`}
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                        className="w-full h-full border-0"
+                      />
+                    </div>
+                  ) : (
+                    <div className="p-6 bg-slate-50 rounded-2xl border border-slate-200 text-center space-y-3">
+                      <p className="text-xs text-slate-600">Assista ao tour em vídeo deste imóvel:</p>
+                      <a
+                        href={property.videoUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 px-5 py-2.5 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-bold transition-all shadow-md active:scale-95"
+                      >
+                        <Play className="w-4 h-4 fill-white" />
+                        <span>Abrir Vídeo / Reels Externo</span>
+                      </a>
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* Description */}
               <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-sm space-y-4">
