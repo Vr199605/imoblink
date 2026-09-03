@@ -19,6 +19,8 @@ import {
   Users
 } from 'lucide-react';
 
+const KIWIFY_CHECKOUT_URL = process.env.NEXT_PUBLIC_KIWIFY_CHECKOUT_URL || 'https://pay.kiwify.com.br/ZgR5Km3';
+
 export default function HomePage() {
   return (
     <>
@@ -48,14 +50,16 @@ export default function HomePage() {
               </p>
 
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
-                <Link
-                  href="/dashboard"
+                <a
+                  href={KIWIFY_CHECKOUT_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="w-full sm:w-auto px-8 py-4 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold rounded-2xl shadow-xl shadow-emerald-600/25 transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2 text-base"
                 >
-                  <Building2 className="w-5 h-5" />
-                  <span>Acessar Painel do Corretor</span>
+                  <Sparkles className="w-5 h-5" />
+                  <span>Garantir Acesso Vitalício</span>
                   <ArrowRight className="w-4 h-4" />
-                </Link>
+                </a>
 
                 <Link
                   href="/c/carlos-silva"
@@ -291,13 +295,15 @@ export default function HomePage() {
               Acesse o painel agora, configure seus dados e crie seu primeiro catálogo em menos de 5 minutos.
             </p>
             <div className="pt-4">
-              <Link
-                href="/dashboard"
+              <a
+                href={KIWIFY_CHECKOUT_URL}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 px-8 py-4 bg-slate-900 hover:bg-slate-800 text-white font-extrabold rounded-2xl shadow-2xl text-base transition-all hover:scale-105 active:scale-95"
               >
-                <span>Acessar Painel Grátis</span>
+                <span>Garantir Acesso Vitalício na Kiwify</span>
                 <ArrowRight className="w-4 h-4" />
-              </Link>
+              </a>
             </div>
           </div>
         </section>
