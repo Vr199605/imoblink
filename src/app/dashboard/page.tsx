@@ -2,10 +2,12 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Property, BrokerProfile } from '@/types';
 import { getBrokerProfile, getProperties, deleteProperty } from '@/lib/storage';
+import { supabase, isSupabaseConfigured } from '@/lib/supabase/client';
 import { formatCurrency } from '@/lib/utils';
 import { 
   Building2, 
@@ -26,17 +28,92 @@ import {
 import ShareModal from '@/components/ShareModal';
 
 export default function DashboardPage() {
+  const router = useRouter();
   const [broker, setBroker] = useState<BrokerProfile | null>(null);
   const [properties, setProperties] = useState<Property[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedType, setSelectedType] = useState<string>('all');
   const [copiedCatalog, setCopiedCatalog] = useState(false);
   const [activeShareProperty, setActiveShareProperty] = useState<Property | null>(null);
+  const [loadingAuth, setLoadingAuth] = useState(true);
 
   useEffect(() => {
-    setBroker(getBrokerProfile());
-    setProperties(getProperties());
-  }, []);
+    async function checkAuth() {
+      if (isSupabaseConfigured && supabase) {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) {
+          router.push('/login');
+          return;
+        }
+
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', session.user.id)
+          .single();
+
+        if (profile) {
+          setBroker({
+            id: profile.id,
+            slug: profile.slug,
+            name: profile.name,
+            creci: profile.creci,
+            phone: profile.phone,
+            email: profile.email,
+            avatarUrl: profile.avatar_url || 'https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&q=80&w=400',
+            bio: profile.bio || '',
+            city: profile.city || 'São Paulo',
+            state: profile.state || 'SP'
+          });
+
+          const { data: props } = await supabase
+            .from('properties')
+            .select('*')
+            .eq('broker_slug', profile.slug);
+
+          if (props && props.length > 0) {
+            setProperties(props.map(p => ({
+              id: p.id,
+              slug: p.slug,
+              brokerSlug: p.broker_slug,
+              title: p.title,
+              description: p.description,
+              type: p.type,
+              purpose: p.purpose,
+              status: p.status,
+              price: Number(p.price),
+              condoFee: Number(p.condo_fee || 0),
+              iptu: Number(p.iptu || 0),
+              bedrooms: p.bedrooms,
+              suites: p.suites,
+              bathrooms: p.bathrooms,
+              garageSpots: p.garage_spots,
+              areaM2: Number(p.area_m2),
+              neighborhood: p.neighborhood,
+              city: p.city,
+              state: p.state,
+              tags: p.tags || [],
+              images: p.images || [],
+              featured: p.featured,
+              code: p.code,
+              createdAt: p.created_at
+            })));
+          } else {
+            setProperties(getProperties());
+          }
+        } else {
+          setBroker(getBrokerProfile());
+          setProperties(getProperties());
+        }
+      } else {
+        setBroker(getBrokerProfile());
+        setProperties(getProperties());
+      }
+      setLoadingAuth(false);
+    }
+
+    checkAuth();
+  }, [router]);
 
   if (!broker) return null;
 

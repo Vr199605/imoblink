@@ -35,6 +35,19 @@ export default function CadastroPage() {
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
+  React.useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const paramEmail = params.get('email');
+      const paramName = params.get('name');
+      if (paramEmail) setEmail(paramEmail);
+      if (paramName) {
+        setName(paramName);
+        setSlug(generateSlug(paramName));
+      }
+    }
+  }, []);
+
   const handleNameChange = (val: string) => {
     setName(val);
     if (!slug || slug === generateSlug(name)) {
@@ -48,12 +61,26 @@ export default function CadastroPage() {
     setLoading(true);
 
     const finalSlug = slug.trim() || generateSlug(name);
+    const cleanEmail = email.trim().toLowerCase();
 
     try {
       if (isSupabaseConfigured && supabase) {
-        // 1. Criar usuário no Supabase Auth
+        // 1. Validar se o e-mail realizou a compra na Kiwify (tabela orders)
+        const { data: orderMatches } = await supabase
+          .from('orders')
+          .select('*')
+          .ilike('customer_email', cleanEmail)
+          .limit(1);
+
+        if (!orderMatches || orderMatches.length === 0) {
+          setErrorMessage('Não encontramos uma compra aprovada para este e-mail. Por favor, utilize o mesmo e-mail informado na compra da Kiwify ou garanta seu acesso.');
+          setLoading(false);
+          return;
+        }
+
+        // 2. Criar usuário no Supabase Auth
         const { data: authData, error: authError } = await supabase.auth.signUp({
-          email,
+          email: cleanEmail,
           password,
           options: {
             data: {
@@ -67,13 +94,13 @@ export default function CadastroPage() {
 
         if (authError) throw authError;
 
-        // 2. Salvar Perfil na tabela profiles
+        // 3. Salvar Perfil na tabela profiles
         if (authData.user) {
-          const { error: profileError } = await supabase.from('profiles').insert([
+          const { error: profileError } = await supabase.from('profiles').upsert([
             {
               id: authData.user.id,
               name,
-              email,
+              email: cleanEmail,
               creci,
               phone,
               slug: finalSlug,
@@ -85,6 +112,12 @@ export default function CadastroPage() {
           ]);
           if (profileError) console.error('Profile creation error:', profileError);
         }
+
+        // 4. Efetuar login imediatamente para criar a sessão ativa
+        await supabase.auth.signInWithPassword({
+          email: cleanEmail,
+          password
+        });
 
         router.push('/dashboard');
       } else {

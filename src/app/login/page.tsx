@@ -56,7 +56,7 @@ export default function LoginPage() {
               Acesse seu Painel
             </h1>
             <p className="text-xs text-slate-500">
-              Gerencie seus imóveis, visualize m²tricas e envie links no WhatsApp
+              Gerencie seus imóveis, visualize métricas e envie links no WhatsApp
             </p>
           </div>
 
@@ -127,11 +127,24 @@ export default function LoginPage() {
               </button>
             </form>
 
-            <div className="pt-4 border-t border-slate-100 text-center text-xs text-slate-500">
-              Ainda não tem sua conta?{' '}
-              <Link href="/cadastro" className="font-bold text-emerald-600 hover:underline">
-                Criar Meu Catálogo Grátis
-              </Link>
+            <div className="pt-4 border-t border-slate-100 text-center space-y-2 text-xs text-slate-500">
+              <div>
+                Comprou na Kiwify e quer ativar seu acesso?{' '}
+                <Link href="/cadastro" className="font-bold text-emerald-600 hover:underline">
+                  Ativar Minha Conta
+                </Link>
+              </div>
+              <div>
+                Ainda não tem acesso?{' '}
+                <a
+                  href={process.env.NEXT_PUBLIC_KIWIFY_CHECKOUT_URL || 'https://pay.kiwify.com.br/ZgR5Km3'}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-bold text-slate-800 hover:text-emerald-600 underline"
+                >
+                  Garantir Acesso Vitalício
+                </a>
+              </div>
             </div>
           </div>
         </div>
