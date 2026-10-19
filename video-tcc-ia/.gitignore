@@ -1,0 +1,3 @@
+node_modules
+out/*
+!out/video_ia_monografia.mp4

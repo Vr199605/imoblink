@@ -1,0 +1,25 @@
+{
+  "name": "video-tcc-ia",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Vídeo animado (Remotion) sobre uso ético e prático de IA em TCCs",
+  "scripts": {
+    "studio": "remotion studio src/index.ts",
+    "typecheck": "tsc --noEmit",
+    "render": "remotion render src/index.ts MainComposition out/video_ia_monografia.mp4",
+    "still": "remotion still src/index.ts MainComposition out/preview.png"
+  },
+  "dependencies": {
+    "@fontsource/inter": "5.3.0",
+    "@fontsource/poppins": "5.3.0",
+    "@remotion/cli": "4.0.536",
+    "lucide-react": "0.400.0",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "remotion": "4.0.536"
+  },
+  "devDependencies": {
+    "@types/react": "18.3.3",
+    "typescript": "5.4.5"
+  }
+}
